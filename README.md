@@ -37,10 +37,10 @@ msg : 发布的消息内容。可以是任何类型。
 MessageBus.subscribe(topic, handler, scope, data, cache)。订阅某主题。
 
 topic : 主题。如com.github.xwcoder, 可以含有通配符。  
-handler : function. 当有消息在订阅上发布时的处理函数。function(topic, msg, data){//doSomething}  
-    +   topic : 发布消息的主题
-    +   msg : 发布的消息内容
-    +   data : 订阅时传递的数据
+handler : function. 当有消息在订阅上发布时的处理函数。function(topic, msg, data){//doSomething}
++   topic : 发布消息的主题
++   msg : 发布的消息内容
++   data : 订阅时传递的数据
 scope : handler执行的作用域，默认是window。  
 data : 可以用来给handler传递数据。   
 cache : 订阅是否支持订阅模式, 默认是false。
