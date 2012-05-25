@@ -11,12 +11,13 @@ MessageBus
 ## 主题格式 ##
 
 以'.'作为分隔符的字符串，支持'\*'和'\*\*'作为通配符，'\*\*'后不能再有字符；类似Java中
-包的写法，如：com.github.xwcoder。不能含有如下符号^  
+包的写法，如：com.github.xwcoder。不能含有如下符号^ 。 
+
 '\*'通配一个部分  
 '\*\*'通配余下的所有部分
 
-com.\*.xwcoder  com.github.\*  \*.github.xwcoder都匹配com.github.xwcoder  
-\*\*  com.\*\* 匹配com.github.xwcoder
+com.\*.xwcoder、  com.github.\*、  \*.github.xwcoder都匹配com.github.xwcoder  
+\*\*、  com.\*\*、 匹配com.github.xwcoder
 
 ## api ##
 
@@ -30,19 +31,19 @@ MessageBus.setConfig({cache:boolean})。目前只支持一个参数cache, true:�
 MessageBus.publish(topic, msg)。在某个主题发布消息。
 
 topic : 主题。如com.github.xwcoder, 不能含有通配符。  
-msg : 发布的消息内容。可以是任何类型
+msg : 发布的消息内容。可以是任何类型。
 
 ### subscribe ###
 MessageBus.subscribe(topic, handler, scope, data, cache)。订阅某主题。
 
-topic : 主题。如com.github.xwcoder, 可以含有通配符。
-handler : function. 当有消息在订阅上发布时的处理函数。function(topic, msg, data){//doSomething}
-            *topic : 发布消息的主题
-            *msg : 发布的消息内容
-            *data : 订阅时传递的数据
-scope : handler执行的作用域，默认是window
-data : 可以用来给handler传递数据
-cache : 订阅是否支持订阅模式, 默认是false
+topic : 主题。如com.github.xwcoder, 可以含有通配符。  
+handler : function. 当有消息在订阅上发布时的处理函数。function(topic, msg, data){//doSomething}  
+            * topic : 发布消息的主题
+            * msg : 发布的消息内容
+            * data : 订阅时传递的数据
+scope : handler执行的作用域，默认是window。  
+data : 可以用来给handler传递数据。   
+cache : 订阅是否支持订阅模式, 默认是false。
 
 此方法有一个返回值sid, 一个唯一的字符串标识本次订阅。用于取消订阅。
 
