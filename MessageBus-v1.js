@@ -8,8 +8,7 @@
     var toString = Object.prototype.toString;
 
     var generateId = function(prefix){
-        prefix = prefix || '';
-        return id++;
+        return (prefix || '') + id++;
     };
 
     var throwException = function(msg){
