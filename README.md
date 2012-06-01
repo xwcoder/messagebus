@@ -10,11 +10,11 @@ MessageBus
 
 ## 主题格式 ##
 
-以'.'作为分隔符的字符串，支持'\*'和'\*\*'作为通配符，'\*\*'后不能再有字符；类似Java中
+以'.'作为分隔符的字符串，支持'\*'和'\*\*'作为通配符；类似Java中
 包的写法，如：com.github.xwcoder。不能含有如下符号^ 。 
 
-'\*'通配一个部分  
-'\*\*'通配余下的所有部分
+'\*'通配一级且仅通配一级目录  
+'\*\*'通配0或N级目录
 
 com.\*.xwcoder、  com.github.\*、  \*.github.xwcoder都匹配com.github.xwcoder  
 \*\*、  com.\*\*、 匹配com.github.xwcoder
@@ -54,5 +54,7 @@ MessageBus.unsubscribe(sid)。取消某次订阅。
 sid : subscribe方法的返回值。
 
 ##文件说明##
-MessageBus-v1.js、 MessageBus-v2.js ：是同一版本的不同写法。  
-demo-v1.html、demo-v2.html ：demo页面
+messagebus-v1.js、 messagebus-v2.js ：是同一版本的不同写法。  
+demo-v1.html、demo-v2.html ：demo页面。
+目前测试时只使用messagebus-v2.js，所以v2比v1靠谱
+

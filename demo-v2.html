@@ -228,5 +228,58 @@
 
         </script>
     </section>
+
+    <section id="s12">
+        <h1>**通配符:测试后订阅的匹配正则</h1>
+        <button class="subBtn">订阅</button>
+        <button class="pubBtn1">发布click</button>
+        <button class="pubBtn2">发布loaded</button>
+        <div class="content1"></div>
+        <div class="content2"></div>
+        <script>
+            document.querySelector('#s12 .pubBtn1').addEventListener('click',function(){
+                //bus.publish('sougou.map.tv.click',{msg : 'lazy sub'});
+                bus.publish('sougou.click.v4.loaded',{msg : 'lazy sub'});
+            },false);
+            document.querySelector('#s12 .pubBtn2').addEventListener('click',function(){
+                bus.publish('sougou.map.v3.click.v4.loaded',{msg : 'lazy sub'});
+            },false);
+
+            document.querySelector('#s12 .subBtn').addEventListener('click',function(){
+                bus.subscribe('**.sougou.**.click.*.loaded',function(topic, msg, data){
+                    if(topic == 'sougou.map.v3.click.v4.loaded'){
+                        document.querySelector('#s12 .content2').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    }else{
+                        document.querySelector('#s12 .content1').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    }
+                }, this, {note:'section s11 publish'},true);
+            });
+
+        </script>
+    </section>
+
+    <section id="s13">
+        <h1>**通配符:测试递归发布</h1>
+        <button class="subBtn">订阅</button>
+        <button class="pubBtn1">发布click</button>
+        <button class="pubBtn2">发布loaded</button>
+        <div class="content1"></div>
+        <div class="content2"></div>
+        <script>
+            document.querySelector('#s13 .pubBtn1').addEventListener('click',function(){
+                bus.publish('sougou.sougou.map.click.click.loaded',{msg : 'lazy sub'});
+            },false);
+            document.querySelector('#s13 .pubBtn2').addEventListener('click',function(){
+                bus.publish('sougou.map.v3.click.v4.loaded',{msg : 'lazy sub'});
+            },false);
+
+            document.querySelector('#s13 .subBtn').addEventListener('click',function(){
+                bus.subscribe('**.sougou.**.click.loaded',function(topic, msg, data){
+                    document.querySelector('#s13 .content1').innerHTML = topic + ':' + msg;
+                }, this, {note:'section s11 publish'},true);
+            });
+
+        </script>
+    </section>
 </body>
 </html>

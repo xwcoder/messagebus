@@ -21,7 +21,8 @@
 
     var checkSubTopic = function(topic){
         (!topic || !topic.length || toString.call(topic) != '[object String]' 
-            || (topic.indexOf('**') != -1 && !(/\*\*$/.test(topic)))
+            //|| (topic.indexOf('**') != -1 && !(/\*\*$/.test(topic)))
+            || (/\*{2}\.\*{2}/.test(topic))
             || (/\*{3}/.test(topic)) || /\.{2}/.test(topic)
             || topic[0] == '.' || topic[topic.length-1] == '.') && illegalTopic(topic);
     };
@@ -62,24 +63,15 @@
         if(p == t){
             return true;
         }
-        p = p.split('.');
-        t = t.split('.');
+        t = t.replace(/\.\*\*\./g,'(((\\..+?\\.)*)|\\.)');
+        t = t.replace(/^\*\*\./,'(.+?\\.)*');
+        t = t.replace(/\.\*\*$/,'(\\..+?)*');
 
-        if(t.length > p.length){
-            return false;
-        }
+        t = t.replace(/\.\*\./g,'(\\..+?\\.)');
+        t = t.replace(/^\*\./g,'(.+?\\.)');
+        t = t.replace(/\.\*$/g,'(\\..+?)');
 
-        var flag = true;
-
-        for(var i = 0, len = p.length; i < len; i++){
-            if(t[i] == '**'){
-                break;
-            }else if(p[i] != t[i] && t[i] != '*'){
-                flag = false;
-                break;
-            }
-        }
-        return flag;
+        return new RegExp(t).test(p);
     };
 
     var query = function(topic){
@@ -115,7 +107,7 @@
                     arguments.callee.call(this, path, ++index, handler, tree.t[token]);
                 }
             })(path, 0, wrapFn, subTree);
-            
+
             if(config.cache && !!cache){
                 var msgs = query(topic);
                 for(i = 0, len = msgs.length; i < len; i++){
@@ -134,16 +126,22 @@
             var tree = subTree;
             var token;
 
-            (function(path, index, tree, msg, topic){
+            (function(path, index, tree, msg, topic, seed){
                 var token = path[index];
                 if(index == path.length){
                     doCall(topic, msg, tree.h);
                 }else{
                     if(tree.t['**']){
-                        doCall(topic, msg, tree.t['**'].h);
+                        if(tree.t['**'].t[token]){
+                            arguments.callee.call(this, path, index + 1, tree.t['**'].t[token], msg, topic, {index : index, tree:tree});
+                        }else{
+                            arguments.callee.call(this, path, index + 1, tree, msg, topic);
+                        }
                     }
                     if(tree.t[token]){
                         arguments.callee.call(this, path, index + 1, tree.t[token], msg, topic);
+                    }else if(seed){
+                        arguments.callee.call(this, path, ++seed.index, seed.tree, msg, topic, seed);
                     }
                     if(tree.t['*']){
                         arguments.callee.call(this, path, index + 1, tree.t['*'], msg, topic);
