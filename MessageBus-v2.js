@@ -23,6 +23,7 @@
         (!topic || !topic.length || toString.call(topic) != '[object String]' 
             || /\*{2}\.\*{2}/.test(topic)
             || /([^\.\*]\*)|(\*[^\.\*])/.test(topic)
+            || /(\*\*\.\*)|(\*\.\*\*)/.test(topic)
             || /\*{3}/.test(topic) || /\.{2}/.test(topic)
             || topic[0] == '.' || topic[topic.length-1] == '.') && illegalTopic(topic);
     };
@@ -41,19 +42,22 @@
             || topic[topic.length] == '.') && illegalTopic(topic);
     };
 
-    var doCall = function(topic, msg, handlers){
+    var doCall = function(topic, msg, handlers, pubId){
         msg = msg || null;
         var wrapFn;
         for(var i = 0, len = handlers.length; i < len; i++){
             wrapFn = handlers[i];
-            wrapFn.execedTime++;
-            if(toString.call(wrapFn.config.execTime) == '[object Number]'
-                    && wrapFn.execedTime >= wrapFn.config.execTime){
-                handlers.splice(i,1);
-                i--;
-                len = handlers.length;
+            if(wrapFn.pubId !== pubId){
+                wrapFn.pubId = pubId;
+                wrapFn.execedTime++;
+                if(toString.call(wrapFn.config.execTime) == '[object Number]'
+                        && wrapFn.execedTime >= wrapFn.config.execTime){
+                    handlers.splice(i,1);
+                    i--;
+                    len = handlers.length;
+                }
+                wrapFn.h.call(wrapFn.scope, topic, msg, wrapFn.data);
             }
-            wrapFn.h.call(wrapFn.scope, topic, msg, wrapFn.data);
         }
     };
 
@@ -134,28 +138,28 @@
             var tree = subTree;
             var token;
 
-            (function(path, index, tree, msg, topic, seed){
+            (function(path, index, tree, msg, topic, pubId, seed){
                 var token = path[index];
                 if(index == path.length){
-                    doCall(topic, msg, (seed && seed.isWildcard) ? tree.t['**'].h : tree.h);
+                    doCall(topic, msg, (seed && seed.isWildcard) ? tree.t['**'].h : tree.h, pubId);
                 }else{
                     if(tree.t['**']){
                         if(tree.t['**'].t[token]){
-                            arguments.callee.call(this, path, index + 1, tree.t['**'].t[token], msg, topic, {index : index, tree:tree});
+                            arguments.callee.call(this, path, index + 1, tree.t['**'].t[token], msg, topic, pubId, {index : index, tree:tree});
                         }else{
-                            arguments.callee.call(this, path, index + 1, tree, msg, topic, {isWildcard : true});
+                            arguments.callee.call(this, path, index + 1, tree, msg, topic, pubId, {isWildcard : true});
                         }
                     }
                     if(tree.t[token]){
-                        arguments.callee.call(this, path, index + 1, tree.t[token], msg, topic);
+                        arguments.callee.call(this, path, index + 1, tree.t[token], msg, topic, pubId);
                     }else if(seed && !seed.isWildcard){
-                        arguments.callee.call(this, path, ++seed.index, seed.tree, msg, topic, seed);
+                        arguments.callee.call(this, path, ++seed.index, seed.tree, msg, topic, pubId, seed);
                     }
                     if(tree.t['*']){
-                        arguments.callee.call(this, path, index + 1, tree.t['*'], msg, topic);
+                        arguments.callee.call(this, path, index + 1, tree.t['*'], msg, topic, pubId);
                     }
                 }
-            })(path, 0, tree, msg, topic);
+            })(path, 0, tree, msg, topic, generateId());
         },
         unsubscribe : function(sid){
             var sid = sid.split('^');

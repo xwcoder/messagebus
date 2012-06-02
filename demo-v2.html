@@ -6,6 +6,7 @@
     <script src="messagebus-v2.js"></script>
     <script>
         var bus = MessageBus;
+        var log = console.log;
     </script>
 </head>
 <body>
@@ -20,7 +21,8 @@
             },false);
             document.querySelector('#s1 .subBtn').addEventListener('click',function(){
                 bus.subscribe('section1.sohu.tv.click',function(topic, msg, data){
-                    document.querySelector('#s1 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s1 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('section1.sohu.tv.click : ' + topic);
                 }, this, {note:'section s1 publish'});
             });
         </script>
@@ -38,7 +40,8 @@
 
             document.querySelector('#s2 .subBtn').addEventListener('click',function(){
                 bus.subscribe('section2.sohu.tv.*',function(topic, msg, data){
-                    document.querySelector('#s2 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s2 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('section2.sohu.tv.* : ' + topic);
                 }, this, {note:'section s2 publish'});
             });
         </script>
@@ -56,7 +59,8 @@
 
             document.querySelector('#s3 .subBtn').addEventListener('click',function(){
                 bus.subscribe('*.tv.click',function(topic, msg, data){
-                    document.querySelector('#s3 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s3 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s3');
                 }, this, {note:'section s3 publish'});
             });
         </script>
@@ -75,6 +79,7 @@
             document.querySelector('#s4 .subBtn').addEventListener('click',function(){
                 bus.subscribe('**',function(topic, msg, data){
                     document.querySelector('#s4 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s4');
                 }, this, {note:'section s4 publish'});
             });
         </script>
@@ -92,7 +97,8 @@
 
             document.querySelector('#s5 .subBtn').addEventListener('click',function(){
                 bus.subscribe('cn.**',function(topic, msg, data){
-                    document.querySelector('#s5 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s5 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s5');
                 }, this, {note:'section s5 publish'});
             });
         </script>
@@ -110,7 +116,8 @@
 
             document.querySelector('#s6 .subBtn').addEventListener('click',function(){
                 bus.subscribe('edu.bjjt.un',function(topic, msg, data){
-                    document.querySelector('#s6 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s6 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s6');
                 }, this, {note:'section s6 publish'},{cache : true});
             });
         </script>
@@ -128,7 +135,8 @@
 
             document.querySelector('#s7 .subBtn').addEventListener('click',function(){
                 bus.subscribe('*.edu.bjjt.un',function(topic, msg, data){
-                    document.querySelector('#s7 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s7 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s7');
                 }, this, {note:'section s7 publish'},{cache : true});
             });
         </script>
@@ -146,7 +154,8 @@
 
             document.querySelector('#s8 .subBtn').addEventListener('click',function(){
                 bus.subscribe('**',function(topic, msg, data){
-                    document.querySelector('#s8 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s8 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s8');
                 }, this, {note:'section s8 publish'},{cache : true});
             });
         </script>
@@ -164,7 +173,8 @@
 
             document.querySelector('#s9 .subBtn').addEventListener('click',function(){
                 bus.subscribe('hk.**',function(topic, msg, data){
-                    document.querySelector('#s9 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s9 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s9');
                 }, this, {note:'section s9 publish'},{cache : true});
             });
         </script>
@@ -222,8 +232,10 @@
                 bus.subscribe('sougou.map.*',function(topic, msg, data){
                     if(topic == 'sougou.map.click'){
                         document.querySelector('#s11 .content1').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                        log('sougou.map.click');
                     }else if(topic == 'sougou.map.loaded'){
                         document.querySelector('#s11 .content2').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                        log('sougou.map.loaded');
                     }
                 }, this, {note:'section s11 publish'},{cache : true});
             });
@@ -250,8 +262,10 @@
             document.querySelector('#s12 .subBtn').addEventListener('click',function(){
                 bus.subscribe('**.sougou.**.click.*.loaded',function(topic, msg, data){
                     if(topic == 'sougou.map.v3.click.v4.loaded'){
+                        log('if');
                         document.querySelector('#s12 .content2').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
                     }else{
+                        log('else');
                         document.querySelector('#s12 .content1').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
                     }
                 }, this, {note:'section s11 publish'},{cache : true});
@@ -269,15 +283,16 @@
         <div class="content2"></div>
         <script>
             document.querySelector('#s13 .pubBtn1').addEventListener('click',function(){
-                bus.publish('sougou.sougou.map.click.click.loaded',{msg : 'lazy sub'});
+                bus.publish('sougou.sougou.sougou.map.click.click.loaded',{msg : 'lazy sub'});
             },false);
             document.querySelector('#s13 .pubBtn2').addEventListener('click',function(){
                 bus.publish('sougou.map.v3.click.v4.loaded',{msg : 'lazy sub'});
             },false);
 
             document.querySelector('#s13 .subBtn').addEventListener('click',function(){
-                bus.subscribe('**.sougou.**.click.*.loaded',function(topic, msg, data){
-                    document.querySelector('#s13 .content1').innerHTML = topic + ':' + msg;
+                bus.subscribe('**.sougou.**.click.**.loaded',function(topic, msg, data){
+                    //document.querySelector('#s13 .content1').innerHTML = topic + ':' + msg;
+                    console.log('**.sougou.**.click.loaded' + ' : ' + topic);
                 }, this, {note:'section s11 publish'},{cache : true});
             });
 
