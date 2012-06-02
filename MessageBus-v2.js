@@ -2,7 +2,7 @@
     var id = 1;
     var subTree = {t:{},h:[]};
     var pubItems = {};
-    var config = {
+    var globalConfig = {
         cache : true
     };
     var toString = Object.prototype.toString;
@@ -21,9 +21,9 @@
 
     var checkSubTopic = function(topic){
         (!topic || !topic.length || toString.call(topic) != '[object String]' 
-            //|| (topic.indexOf('**') != -1 && !(/\*\*$/.test(topic)))
-            || (/\*{2}\.\*{2}/.test(topic))
-            || (/\*{3}/.test(topic)) || /\.{2}/.test(topic)
+            || /\*{2}\.\*{2}/.test(topic)
+            || /([^\.\*]\*)|(\*[^\.\*])/.test(topic)
+            || /\*{3}/.test(topic) || /\.{2}/.test(topic)
             || topic[0] == '.' || topic[topic.length-1] == '.') && illegalTopic(topic);
     };
 
@@ -46,6 +46,13 @@
         var wrapFn;
         for(var i = 0, len = handlers.length; i < len; i++){
             wrapFn = handlers[i];
+            wrapFn.execedTime++;
+            if(toString.call(wrapFn.config.execTime) == '[object Number]'
+                    && wrapFn.execedTime >= wrapFn.config.execTime){
+                handlers.splice(i,1);
+                i--;
+                len = handlers.length;
+            }
             wrapFn.h.call(wrapFn.scope, topic, msg, wrapFn.data);
         }
     };
@@ -60,7 +67,7 @@
     };
 
     var match = function(p, t){
-        if(p == t){
+        if(p == t || t == '**'){
             return true;
         }
         t = t.replace(/\.\*\*\./g,'(((\\..+?\\.)*)|\\.)');
@@ -87,13 +94,14 @@
     var MessageBus = {
         version : '1.0',
 
-        subscribe : function(topic, handler, scope, data, cache){
+        subscribe : function(topic, handler, scope, data, config){
             checkSubTopic(topic); 
             checkIllegalCharactor(topic);
             scope = scope || window;
+            config = config || {};
 
             var sid = generateId();
-            var wrapFn = {h : handler, scope : scope, data : data, sid : sid};
+            var wrapFn = {h : handler, scope : scope, data : data, sid : sid, execedTime : 0, config : config};
             var path = topic.split('.'), i = 0, len = path.length;
             
             (function(path, index, handler, tree){
@@ -108,7 +116,7 @@
                 }
             })(path, 0, wrapFn, subTree);
 
-            if(config.cache && !!cache){
+            if(globalConfig.cache && !!config.cache){
                 var msgs = query(topic);
                 for(i = 0, len = msgs.length; i < len; i++){
                     handler.call(scope, msgs[i].topic, msgs[i].value, data);
@@ -129,18 +137,18 @@
             (function(path, index, tree, msg, topic, seed){
                 var token = path[index];
                 if(index == path.length){
-                    doCall(topic, msg, tree.h);
+                    doCall(topic, msg, (seed && seed.isWildcard) ? tree.t['**'].h : tree.h);
                 }else{
                     if(tree.t['**']){
                         if(tree.t['**'].t[token]){
                             arguments.callee.call(this, path, index + 1, tree.t['**'].t[token], msg, topic, {index : index, tree:tree});
                         }else{
-                            arguments.callee.call(this, path, index + 1, tree, msg, topic);
+                            arguments.callee.call(this, path, index + 1, tree, msg, topic, {isWildcard : true});
                         }
                     }
                     if(tree.t[token]){
                         arguments.callee.call(this, path, index + 1, tree.t[token], msg, topic);
-                    }else if(seed){
+                    }else if(seed && !seed.isWildcard){
                         arguments.callee.call(this, path, ++seed.index, seed.tree, msg, topic, seed);
                     }
                     if(tree.t['*']){
@@ -156,14 +164,14 @@
             }
             var path = sid[0].split('.');
             var id = sid[1];
-            
+
             (function(path, index, tree, id){
                 var token = path[index];
                 if(index == path.length){
                     deleteWrapFn(tree.h, id);
                 }else{
                     if(tree.t[token]){
-                        arguments.callee.call(path, ++index, tree.t[token], id);
+                        arguments.callee.call(this,path, ++index, tree.t[token], id);
                     }            
                 }
             })(path, 0, subTree, id);
@@ -171,7 +179,7 @@
         setConfig : function(c){
             if(c && toString.call(c) == '[object Object]'){
                 for(var p in c){
-                    config[p] = c[p];
+                    globalConfig[p] = c[p];
                 }
             }
         }

@@ -44,7 +44,7 @@ handler : function. 当有消息在订阅上发布时的处理函数。function(
 
 scope : handler执行的作用域，默认是window。  
 data : 可以用来给handler传递数据。   
-cache : 订阅是否支持订阅模式, 默认是false。
+config : {cache : boolean, execTime : number}。cache: 订阅是否支持订阅模式, 默认是false。execTime : 执行几次, 默认无限次
 
 此方法有一个返回值sid, 一个唯一的字符串标识本次订阅。用于取消订阅。
 
