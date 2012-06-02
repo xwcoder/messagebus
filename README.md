@@ -34,7 +34,7 @@ topic : 主题。如com.github.xwcoder, 不能含有通配符。
 msg : 发布的消息内容。可以是任何类型。
 
 ### subscribe ###
-MessageBus.subscribe(topic, handler, scope, data, cache)。订阅某主题。
+MessageBus.subscribe(topic, handler, scope, data, config)。订阅某主题。
 
 topic : 主题。如com.github.xwcoder, 可以含有通配符。  
 handler : function. 当有消息在订阅上发布时的处理函数。function(topic, msg, data){//doSomething}
