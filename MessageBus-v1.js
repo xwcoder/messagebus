@@ -1,11 +1,15 @@
-(function(window,undefined){
+(function(window, undefined){
     var id = 1;
-    var subTree = {t:{},h:[]};
-    var pubItems = {};
-    var globalConfig = {
-        cache : true
-    };
     var toString = Object.prototype.toString;
+    
+    var applyIf = function(o, c) {
+        if (o) {
+            for (var p in c) {
+                typeof o[p] === 'undefined' && (o[p] = c[p]);
+            }
+        }
+        return o;
+    };
 
     var generateId = function(prefix){
         return (prefix || '') + id++;
@@ -21,9 +25,10 @@
 
     var checkSubTopic = function(topic){
         (!topic || !topic.length || toString.call(topic) != '[object String]' 
-            || (/\*{2}\.\*{2}/.test(topic))
+            || /\*{2}\.\*{2}/.test(topic)
             || /([^\.\*]\*)|(\*[^\.\*])/.test(topic)
-            || (/\*{3}/.test(topic)) || /\.{2}/.test(topic)
+            || /(\*\*\.\*)|(\*\.\*\*)/.test(topic)
+            || /\*{3}/.test(topic) || /\.{2}/.test(topic)
             || topic[0] == '.' || topic[topic.length-1] == '.') && illegalTopic(topic);
     };
 
@@ -41,65 +46,49 @@
             || topic[topic.length] == '.') && illegalTopic(topic);
     };
 
-    var subscribe = function(path, index, handler, tree){
-        var token = path[index];
-        if(index == path.length){
-            tree.h.push(handler); 
-        }else{
-            if(!tree.t[token]){
-                tree.t[token] = {t:{}, h:[]};
-            }
-            subscribe(path, ++index, handler, tree.t[token]);
-        }
-    };
-
-    var publish = function(path, index, tree, msg, topic, seed){
-        var token = path[index];
-        if(index == path.length){
-            doCall(topic, msg, (seed && seed.isWildcard) ? tree.t['**'].h : tree.h);
-        }else{
-            if(tree.t['**']){
-                if(tree.t['**'].t[token]){
-                    publish(path, index + 1, tree.t['**'].t[token], msg, topic, {index : index, tree:tree});
-                }else{
-                    publish(path, index + 1, tree, msg, topic, {isWildcard : true});
+    var doCall = function(topic, msg, handlers, pubId) {
+        msg = msg || null;
+        var wrapFn, config;
+        var checkWait = function(_topics, topics, topic, msg) {
+            var r = true;
+            topics[topic] = msg;
+            _topics[topic] = true;
+            for (var t in _topics) {
+                if (!_topics[t]) {
+                    r = false;
+                    break;
                 }
             }
-            if(tree.t[token]){
-                publish(path, index + 1, tree.t[token], msg, topic);
-            }else if(seed && !seed.isWildcard){
-                publish(path, ++seed.index, seed.tree, msg, topic, seed);
-            }
-            if(tree.t['*']){
-                publish(path, index + 1, tree.t['*'], msg, topic);
-            }
-        }
-    };
+            return r;
+        };
 
-    var unsubscribe = function(path, index, tree, id){
-        var token = path[index];
-        if(index == path.length){
-            deleteWrapFn(tree.h, id);
-        }else{
-            if(tree.t[token]){
-                unsubscribe(path, ++index, tree.t[token], id);
-            }            
-        }
-    };
+        var clearWait = function(_topics) {
+            for (var t in _topics) {
+                _topics[t] = false;
+            }
+        };
 
-    var doCall = function(topic, msg, handlers){
-        msg = msg || null;
-        var wrapFn;
-        for(var i = 0, len = handlers.length; i < len; i++){
+        for (var i = 0, len = handlers.length; i < len; i++) {
             wrapFn = handlers[i];
-            wrapFn.execedTime++;
-            if(toString.call(wrapFn.config.execTime) == '[object Number]'
-                    && wrapFn.execedTime >= wrapFn.config.execTime){
-                handlers.splice(i,1);
-                i--;
-                len = handlers.length;
+            if (typeof pubId === 'undefined' || wrapFn.pubId !== pubId) {
+                wrapFn.pubId = pubId;
+                config = wrapFn.config;
+                       
+                if (config && config._topics) {
+                    if (checkWait(config._topics, config.topics, topic, msg)) {
+                        clearWait(config._topics);
+                        wrapFn.h.call(wrapFn.scope, topic, config.topics , wrapFn.data);
+                    }
+                } else {
+                    wrapFn.execedTime++;
+                    if (toString.call(wrapFn.config.execTime) == '[object Number]'
+                            && wrapFn.execedTime >= wrapFn.config.execTime) {
+                        handlers.splice(i--,1);
+                        len = handlers.length;
+                    }
+                    wrapFn.h.call(wrapFn.scope, topic, msg, wrapFn.data);
+                }
             }
-            wrapFn.h.call(wrapFn.scope, topic, msg, wrapFn.data);
         }
     };
 
@@ -127,20 +116,21 @@
         return new RegExp(t).test(p);
     };
 
-    var query = function(topic){
-        var msgs = [];
-        for(var p in pubItems){
-            if(match(p, topic)){
-                msgs.push({topic : p, value : pubItems[p]});
-            }
-        }
-        return msgs;
+    var defaults = {
+        cache : true
     };
 
-    var MessageBus = {
+    function MessageBus(c) {
+        c = c || {};
+        this.config = applyIf(c, defaults);
+        this.subTree = {t:{},h:[]};
+        this.pubItems = {};
+    }
+
+    applyIf(MessageBus.prototype, {
         version : '1.0',
 
-        subscribe : function(topic, handler, scope, data, config){
+        subscribe : function(topic, handler, scope, data, config) {
             checkSubTopic(topic); 
             checkIllegalCharactor(topic);
             scope = scope || window;
@@ -149,46 +139,124 @@
             var sid = generateId();
             var wrapFn = {h : handler, scope : scope, data : data, sid : sid, execedTime : 0, config : config};
             var path = topic.split('.'), i = 0, len = path.length;
-
-            subscribe(path, 0, wrapFn, subTree);
             
-            if(globalConfig.cache && !!config.cache){
-                var msgs = query(topic);
+            (function(path, index, handler, tree){
+                var token = path[index];
+                if(index == path.length){
+                    tree.h.push(handler); 
+                }else{
+                    if(!tree.t[token]){
+                        tree.t[token] = {t:{}, h:[]};
+                    }
+                    arguments.callee.call(this, path, ++index, handler, tree.t[token]);
+                }
+            })(path, 0, wrapFn, this.subTree);
+
+            if(this.config.cache && !!config.cache){
+                var msgs = this.query(topic);
                 for(i = 0, len = msgs.length; i < len; i++){
-                    handler.call(scope, msgs[i].topic, msgs[i].value, data);
+                    doCall(msgs[i].topic, msgs[i].value, [wrapFn]);
                 }
             }
             return topic + '^' + sid;
         },
-        publish : function(topic, msg){
+
+        publish : function(topic, msg) {
             checkPubTopic(topic);
             checkIllegalCharactor(topic);
 
-            pubItems[topic] = msg;
+            this.pubItems[topic] = msg;
 
             var path = topic.split('.');
-            var tree = subTree;
             var token;
-            publish(path, 0, tree, msg, topic);
-        },
-        unsubscribe : function(sid){
-            var sid = sid.split('^');
-            if(sid.length != 2){
-                throwException('illegal sid:' + sid);
-            }
-            var path = sid[0].split('.');
-            var id = sid[1];
 
-            unsubscribe(path, 0, subTree, id);
+            (function(path, index, tree, msg, topic, pubId, seed){
+                var token = path[index];
+                if(index == path.length){
+                    doCall(topic, msg, (seed && seed.isWildcard) ? tree.t['**'].h : tree.h, pubId);
+                }else{
+                    if(tree.t['**']){
+                        if(tree.t['**'].t[token]){
+                            arguments.callee.call(this, path, index + 1, tree.t['**'].t[token], msg, topic, pubId, {index : index, tree:tree});
+                        }else{
+                            arguments.callee.call(this, path, index + 1, tree, msg, topic, pubId, {isWildcard : true});
+                        }
+                    }
+                    if(tree.t[token]){
+                        arguments.callee.call(this, path, index + 1, tree.t[token], msg, topic, pubId);
+                    }else if(seed && !seed.isWildcard){
+                        arguments.callee.call(this, path, ++seed.index, seed.tree, msg, topic, pubId, seed);
+                    }
+                    if(tree.t['*']){
+                        arguments.callee.call(this, path, index + 1, tree.t['*'], msg, topic, pubId);
+                    }
+                }
+            })(path, 0, this.subTree, msg, topic, generateId());
         },
-        setConfig : function(c){
-            if(c && toString.call(c) == '[object Object]'){
-                for(var p in c){
-                    globalConfig[p] = c[p];
+
+        unsubscribe : function(sids) {
+            var me = this;
+
+            var unsubscribe = function(sid) {
+                var sid = sid.split('^');
+                if(sid.length != 2){
+                    throwException('illegal sid:' + sid);
+                }
+                var path = sid[0].split('.');
+                var id = sid[1];
+                (function(path, index, tree, id){
+                    var token = path[index];
+                    if(index == path.length){
+                        deleteWrapFn(tree.h, id);
+                    }else{
+                        if(tree.t[token]){
+                            arguments.callee.call(this, path, ++index, tree.t[token], id);
+                        }            
+                    }
+                })(path, 0, me.subTree, id);
+            };
+
+            var sids = sids.split(';');
+            var i = 0, len = sids.length;
+            for (; i < len; i++) {
+                unsubscribe(sids[i]);
+            }
+        },
+
+        query : function(topic) {
+            var msgs = [];
+            var pubItems = this.pubItems;
+            for(var p in pubItems){
+                if(match(p, topic)){
+                    msgs.push({topic : p, value : pubItems[p]});
                 }
             }
-        }
-    }; 
+            return msgs;
+        },
 
-    window.MessageBus = MessageBus;
-})(window,undefined);
+        wait : function(topics, handler, scope, data, config) {
+            if (toString.call(topics) !== '[object Array]' || !topics.length) {
+                return;
+            } 
+
+            config.topics = {};
+            config._topics = {};
+            var sids = [];
+
+            var i = 0, len = topics.length, topic;
+            for (; i < len; i++) {
+                topic = topics[i];
+                checkPubTopic(topics[i]);
+                config.topics[topic] = null;
+                config._topics[topic] = false;
+            }
+
+            for (i = 0; i < len; i++) {
+                sids.push(this.subscribe(topics[i], handler, scope, data, config)); 
+            }
+            return sids.join(';');
+        }
+    });
+
+    window.MessageBus = new MessageBus();
+})(window, undefined);

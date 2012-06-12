@@ -3,14 +3,15 @@
 <head>
     <title>demo</title>
     <meta charset="utf-8" />
-    <script src="MessageBus-v1.js"></script>
+    <script src="messagebus-v1.js"></script>
     <script>
         var bus = MessageBus;
+        var log = console.log;
     </script>
 </head>
 <body>
     <section id="s1">
-        <h1>简单订阅发布:section1.sohu.tv.click</h1>
+        <h1>s1:简单订阅发布:section1.sohu.tv.click</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn">发布</button>
         <div class="content"></div>
@@ -20,14 +21,15 @@
             },false);
             document.querySelector('#s1 .subBtn').addEventListener('click',function(){
                 bus.subscribe('section1.sohu.tv.click',function(topic, msg, data){
-                    document.querySelector('#s1 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s1 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('section1.sohu.tv.click : ' + topic);
                 }, this, {note:'section s1 publish'});
             });
         </script>
     </section>
 
     <section id="s2">
-        <h1>通配符订阅发布:section2.sohu.tv.*</h1>
+        <h1>s2:通配符订阅发布:section2.sohu.tv.*</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn">发布</button>
         <div class="content"></div>
@@ -38,14 +40,15 @@
 
             document.querySelector('#s2 .subBtn').addEventListener('click',function(){
                 bus.subscribe('section2.sohu.tv.*',function(topic, msg, data){
-                    document.querySelector('#s2 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s2 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('section2.sohu.tv.* : ' + topic);
                 }, this, {note:'section s2 publish'});
             });
         </script>
     </section>
 
     <section id="s3">
-        <h1>*通配符订阅发布:*.tv.click</h1>
+        <h1>s3:*通配符订阅发布:*.tv.click</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn">发布</button>
         <div class="content"></div>
@@ -56,14 +59,15 @@
 
             document.querySelector('#s3 .subBtn').addEventListener('click',function(){
                 bus.subscribe('*.tv.click',function(topic, msg, data){
-                    document.querySelector('#s3 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s3 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s3');
                 }, this, {note:'section s3 publish'});
             });
         </script>
     </section>
 
     <section id="s4">
-        <h1>**通配符订阅发布:**</h1>
+        <h1>s4:**通配符订阅发布:**</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn">发布</button>
         <div class="content"></div>
@@ -75,13 +79,14 @@
             document.querySelector('#s4 .subBtn').addEventListener('click',function(){
                 bus.subscribe('**',function(topic, msg, data){
                     document.querySelector('#s4 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s4');
                 }, this, {note:'section s4 publish'});
             });
         </script>
     </section>
 
     <section id="s5">
-        <h1>**通配符订阅发布:cn.**</h1>
+        <h1>s5:**通配符订阅发布:cn.**</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn">发布</button>
         <div class="content"></div>
@@ -92,14 +97,15 @@
 
             document.querySelector('#s5 .subBtn').addEventListener('click',function(){
                 bus.subscribe('cn.**',function(topic, msg, data){
-                    document.querySelector('#s5 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    //document.querySelector('#s5 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s5');
                 }, this, {note:'section s5 publish'});
             });
         </script>
     </section>
 
     <section id="s6">
-        <h1>后订阅-简单订阅:com.ww.ww</h1>
+        <h1>s6:后订阅-简单订阅:com.ww.ww</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn">发布</button>
         <div class="content"></div>
@@ -110,14 +116,15 @@
 
             document.querySelector('#s6 .subBtn').addEventListener('click',function(){
                 bus.subscribe('edu.bjjt.un',function(topic, msg, data){
-                    document.querySelector('#s6 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
-                }, this, {note:'section s6 publish'},true);
+                    //document.querySelector('#s6 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s6');
+                }, this, {note:'section s6 publish'},{cache : true});
             });
         </script>
     </section>
 
     <section id="s7">
-        <h1>后订阅-通配符:*.edu.bjjt.un</h1>
+        <h1>s7:后订阅-通配符:*.edu.bjjt.un</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn">发布</button>
         <div class="content"></div>
@@ -128,14 +135,15 @@
 
             document.querySelector('#s7 .subBtn').addEventListener('click',function(){
                 bus.subscribe('*.edu.bjjt.un',function(topic, msg, data){
-                    document.querySelector('#s7 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
-                }, this, {note:'section s7 publish'},true);
+                    //document.querySelector('#s7 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s7');
+                }, this, {note:'section s7 publish'},{cache : true});
             });
         </script>
     </section>
 
     <section id="s8">
-        <h1>后订阅-通配符:**</h1>
+        <h1>s8:后订阅-通配符:**</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn">发布</button>
         <div class="content"></div>
@@ -146,14 +154,15 @@
 
             document.querySelector('#s8 .subBtn').addEventListener('click',function(){
                 bus.subscribe('**',function(topic, msg, data){
-                    document.querySelector('#s8 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
-                }, this, {note:'section s8 publish'},true);
+                    //document.querySelector('#s8 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s8');
+                }, this, {note:'section s8 publish'},{cache : true});
             });
         </script>
     </section>
 
     <section id="s9">
-        <h1>后订阅-通配符:hk.**</h1>
+        <h1>s9:后订阅-通配符:hk.**</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn">发布</button>
         <div class="content"></div>
@@ -164,14 +173,15 @@
 
             document.querySelector('#s9 .subBtn').addEventListener('click',function(){
                 bus.subscribe('hk.**',function(topic, msg, data){
-                    document.querySelector('#s9 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
-                }, this, {note:'section s9 publish'},true);
+                    //document.querySelector('#s9 .content').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    log('s9');
+                }, this, {note:'section s9 publish'},{cache : true});
             });
         </script>
     </section>
 
     <section id="s10">
-        <h1>后订阅-多次订阅:tw.**</h1>
+        <h1>s10:后订阅-多次订阅:tw.**</h1>
         <button class="subBtn1">订阅tw.**</button>
         <button class="subBtn2">订阅tw.apple.tv</button>
         <button class="unsub">取消订阅tw.apple.tv</button>
@@ -187,13 +197,15 @@
             document.querySelector('#s10 .subBtn1').addEventListener('click',function(){
                 bus.subscribe('tw.**',function(topic, msg, data){
                     document.querySelector('#s10 .content1').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
-                }, this, {note:'section s10 publish'},true);
+                    console.log('tw.** : ' + topic + ' : ' + msg.msg);
+                }, this, {note:'section s10 publish'},{cache : true});
             });
 
             document.querySelector('#s10 .subBtn2').addEventListener('click',function(){
                 sid = bus.subscribe('tw.apple.tv',function(topic, msg, data){
                     document.querySelector('#s10 .content2').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
-                }, this, {note:'section s10 publish content2'},true);
+                    console.log('tw.apple.tv : ' + topic + ' : ' + msg.msg);
+                }, this, {note:'section s10 publish content2'},{cache : true});
             });
             document.querySelector('#s10 .unsub').addEventListener('click',function(){
                 bus.unsubscribe(sid);
@@ -202,7 +214,7 @@
     </section>
 
     <section id="s11">
-        <h1>后订阅-匹配多次发布:sogou.map.*</h1>
+        <h1>s11:后订阅-匹配多次发布:sogou.map.*</h1>
         <button class="subBtn">订阅</button>
         <button class="pubBtn1">发布click</button>
         <button class="pubBtn2">发布loaded</button>
@@ -220,12 +232,102 @@
                 bus.subscribe('sougou.map.*',function(topic, msg, data){
                     if(topic == 'sougou.map.click'){
                         document.querySelector('#s11 .content1').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                        log('sougou.map.click');
                     }else if(topic == 'sougou.map.loaded'){
                         document.querySelector('#s11 .content2').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                        log('sougou.map.loaded');
                     }
-                }, this, {note:'section s11 publish'},true);
+                }, this, {note:'section s11 publish'},{cache : true});
             });
 
+        </script>
+    </section>
+
+    <section id="s12">
+        <h1>s12:**通配符:测试后订阅的匹配正则</h1>
+        <button class="subBtn">订阅</button>
+        <button class="pubBtn1">发布click</button>
+        <button class="pubBtn2">发布loaded</button>
+        <div class="content1"></div>
+        <div class="content2"></div>
+        <script>
+            document.querySelector('#s12 .pubBtn1').addEventListener('click',function(){
+                //bus.publish('sougou.map.tv.click',{msg : 'lazy sub'});
+                bus.publish('sougou.click.v4.loaded',{msg : 'lazy sub'});
+            },false);
+            document.querySelector('#s12 .pubBtn2').addEventListener('click',function(){
+                bus.publish('sougou.map.v3.click.v4.loaded',{msg : 'lazy sub'});
+            },false);
+
+            document.querySelector('#s12 .subBtn').addEventListener('click',function(){
+                bus.subscribe('**.sougou.**.click.*.loaded',function(topic, msg, data){
+                    if(topic == 'sougou.map.v3.click.v4.loaded'){
+                        log('if');
+                        document.querySelector('#s12 .content2').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    }else{
+                        log('else');
+                        document.querySelector('#s12 .content1').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;
+                    }
+                }, this, {note:'section s11 publish'},{cache : true});
+            });
+
+        </script>
+    </section>
+
+    <section id="s13">
+        <h1>s13:**通配符:测试递归发布</h1>
+        <button class="subBtn">订阅</button>
+        <button class="pubBtn1">发布click</button>
+        <button class="pubBtn2">发布loaded</button>
+        <div class="content1"></div>
+        <div class="content2"></div>
+        <script>
+            document.querySelector('#s13 .pubBtn1').addEventListener('click',function(){
+                bus.publish('sougou.sougou.sougou.map.click.click.loaded',{msg : 'lazy sub'});
+            },false);
+            document.querySelector('#s13 .pubBtn2').addEventListener('click',function(){
+                bus.publish('sougou.map.v3.click.v4.loaded',{msg : 'lazy sub'});
+            },false);
+
+            document.querySelector('#s13 .subBtn').addEventListener('click',function(){
+                bus.subscribe('**.sougou.**.click.**.loaded',function(topic, msg, data){
+                    //document.querySelector('#s13 .content1').innerHTML = topic + ':' + msg;
+                    console.log('**.sougou.**.click.loaded' + ' : ' + topic);
+                }, this, {note:'section s11 publish'},{cache : true});
+            });
+
+        </script>
+    </section>
+
+    <section id="s14">
+        <h1>测试wait方法</h1>
+        <button class="subBtn">wait(['com.sohu.login','com.sohu.domreay'])</button>
+        <button class="pubBtn1">发布'com.sohu.login'</button>
+        <button class="pubBtn2">发布'com.sohu.domreay'</button>
+        <button class="pubBtn3">取消订阅</button>
+        <div class="content1"></div>
+        <div class="content2"></div>
+        <script>
+            document.querySelector('#s14 .pubBtn1').addEventListener('click',function(){
+                bus.publish('com.sohu.login',{msg : '第一个btn'});
+            },false);
+
+            document.querySelector('#s14 .pubBtn2').addEventListener('click',function(){
+                bus.publish('com.sohu.domreay',{msg : '第二个btn'});
+            },false);
+            
+            var sid;
+            document.querySelector('#s14 .subBtn').addEventListener('click',function(){
+                sid = bus.wait(['com.sohu.login','com.sohu.domreay'], function(topic, msg, data) {
+                    console.log(topic);   
+                    console.log(msg);   
+                    console.log(data);   
+                }, this, {note:'hello world'}, {cache:true});
+            });
+
+            document.querySelector('#s14 .pubBtn3').addEventListener('click',function(){
+                bus.unsubscribe(sid);
+            },false);
         </script>
     </section>
 </body>

@@ -1,4 +1,4 @@
-(function(window,undefined){
+(function(window, undefined){
     var id = 1;
     var subTree = {t:{},h:[]};
     var pubItems = {};
@@ -190,4 +190,4 @@
     }; 
 
     window.MessageBus = MessageBus;
-})(window,undefined);
+})(window, undefined);
