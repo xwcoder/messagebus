@@ -72,6 +72,10 @@ config : {cache : boolean} 同subscribe方法相比，不支持execTime。可以
 
 此方法有一个返回值sid, 一个唯一的字符串标识本次订阅。用于取消订阅。
 
+### query ###
+MessageBus.query(topic)。查找已经发布主题上的值。  
+不推荐（应该是不要）使用这个方法，我会把它隐藏掉。
+
 ##文件说明##
 <del>messagebus-v1.js、 messagebus-v2.js ：是同一版本的不同写法。</del>      
 <del>demo-v1.html、demo-v2.html ：demo页面。</del>   
