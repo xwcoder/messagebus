@@ -81,3 +81,6 @@ MessageBus.query(topic)。查找已经发布主题上的值。
 <del>demo-v1.html、demo-v2.html ：demo页面。</del>   
 <del>目前测试时只使用messagebus-v2.js，所以v2比v1靠谱</del>
 v1是最新版本：1、使用类方式 2、删除了setConfig方法 3、增加wait方法 4、暴露query方法
+
+代码到260+了，吵了60多啊，mb
+
