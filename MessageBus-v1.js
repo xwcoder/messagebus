@@ -33,7 +33,7 @@
     };
 
     var checkIllegalCharactor = function(topic){
-        var m = /([\^])/.exec(topic);
+        var m = /[^a-zA-Z0-9-_\.\*]/.exec(topic);
         if(m){
             throwException('illegalCharactor:' + m[1]);
         }
@@ -62,7 +62,7 @@
             return r;
         };
 
-        var clearWait = function(_topics) {
+        var clearWait = function(_topics, topics) {
             for (var t in _topics) {
                 _topics[t] = false;
             }
@@ -76,7 +76,7 @@
                        
                 if (config && config._topics) {
                     if (checkWait(config._topics, config.topics, topic, msg)) {
-                        clearWait(config._topics);
+                        clearWait(config._topics, config.topics);
                         wrapFn.h.call(wrapFn.scope, topic, config.topics , wrapFn.data);
                     }
                 } else {
@@ -116,6 +116,16 @@
         return new RegExp(t).test(p);
     };
 
+    var query = function(topic, pubItems) {
+        var msgs = [];
+        for(var p in pubItems){
+            if(match(p, topic)){
+                msgs.push({topic : p, value : pubItems[p]});
+            }
+        }
+        return msgs;
+    };
+
     var defaults = {
         cache : true
     };
@@ -153,7 +163,7 @@
             })(path, 0, wrapFn, this.subTree);
 
             if(this.config.cache && !!config.cache){
-                var msgs = this.query(topic);
+                var msgs = query(topic, this.pubItems);
                 for(i = 0, len = msgs.length; i < len; i++){
                     doCall(msgs[i].topic, msgs[i].value, [wrapFn]);
                 }
@@ -223,17 +233,6 @@
             }
         },
 
-        query : function(topic) {
-            var msgs = [];
-            var pubItems = this.pubItems;
-            for(var p in pubItems){
-                if(match(p, topic)){
-                    msgs.push({topic : p, value : pubItems[p]});
-                }
-            }
-            return msgs;
-        },
-
         wait : function(topics, handler, scope, data, config) {
             if (toString.call(topics) !== '[object Array]' || !topics.length) {
                 return;
@@ -257,6 +256,7 @@
             return sids.join(';');
         }
     });
-
-    window.MessageBus = new MessageBus();
+    
+    window.messagebus = new MessageBus();
+    window.MessageBus = MessageBus;
 })(window, undefined);
