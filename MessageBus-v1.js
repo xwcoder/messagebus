@@ -237,7 +237,8 @@
             if (toString.call(topics) !== '[object Array]' || !topics.length) {
                 return;
             } 
-
+            
+            config = config || {};
             config.topics = {};
             config._topics = {};
             var sids = [];
