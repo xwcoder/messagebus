@@ -70,7 +70,7 @@
 
         for (var i = 0, len = handlers.length; i < len; i++) {
             wrapFn = handlers[i];
-            if (typeof pubId === 'undefined' || wrapFn.pubId !== pubId) {
+            if (wrapFn && (typeof pubId === 'undefined' || wrapFn.pubId !== pubId)) {
                 wrapFn.pubId = pubId;
                 config = wrapFn.config;
                        
