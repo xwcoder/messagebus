@@ -200,7 +200,6 @@
                     console.log('tw.** : ' + topic + ' : ' + msg.msg);
                 }, this, {note:'section s10 publish'},{cache : true});
             });
-
             document.querySelector('#s10 .subBtn2').addEventListener('click',function(){
                 sid = bus.subscribe('tw.apple.tv',function(topic, msg, data){
                     document.querySelector('#s10 .content2').innerHTML = topic + ' : ' + msg.msg + ' : ' + data.note;

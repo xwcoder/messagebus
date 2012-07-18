@@ -1,7 +1,7 @@
 (function(window, undefined){
     var id = 1;
     var toString = Object.prototype.toString;
-    
+
     var applyIf = function(o, c) {
         if (o) {
             for (var p in c) {
@@ -83,8 +83,9 @@
                     wrapFn.execedTime++;
                     if (toString.call(wrapFn.config.execTime) == '[object Number]'
                             && wrapFn.execedTime >= wrapFn.config.execTime) {
-                        handlers.splice(i--,1);
-                        len = handlers.length;
+                        //handlers.splice(i--,1);
+                        //len = handlers.length;
+                        handlers[i] = null;
                     }
                     wrapFn.h.call(wrapFn.scope, topic, msg, wrapFn.data);
                 }
@@ -95,7 +96,8 @@
     var deleteWrapFn = function(h, id){
         for(var i = 0, len = h.length; i < len; i++){
             if(h[i].sid == id){
-                h.splice(i,1);
+                //h.splice(i,1);
+                h[i] = null;
                 break;
             }
         }
