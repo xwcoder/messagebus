@@ -47,7 +47,8 @@
     };
 
     var doCall = function(topic, msg, handlers, pubId) {
-        msg = msg || null;
+        //msg = msg || null;
+        msg = typeof msg == 'undefined' ? null : msg;
         var wrapFn, config;
         var checkWait = function(_topics, topics, topic, msg) {
             var r = true;
