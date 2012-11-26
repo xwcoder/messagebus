@@ -120,6 +120,10 @@
         t = t.replace(/^\*\./g,'(.+?\\.)');
         t = t.replace(/\.\*$/g,'(\\..+?)');
 
+        if ( /[^\.|\*]$/.test( t ) ) {
+            t = t + '$';
+        }
+
         return new RegExp(t).test(p);
     };
 
