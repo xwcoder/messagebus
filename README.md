@@ -84,3 +84,6 @@ v1是最新版本：1、使用类方式 2、删除了setConfig方法 3、增加w
 
 代码暴涨到260+了，多了60多啊，mb
 
+## License ##
+
+All directories and files are MIT Licensed.
