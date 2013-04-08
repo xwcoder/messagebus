@@ -78,11 +78,9 @@
                 if (config && config._topics) {
                     if (checkWait(config._topics, config.topics, topic, msg)) {
                         clearWait(config._topics, config.topics);
-                        //try {
-                        setTimeout( function () {
+                        try {
                             wrapFn.h.call(wrapFn.scope, topic, config.topics , wrapFn.data);
-                        }, 0 );
-                        //} catch ( e1 ) {}
+                        } catch ( e1 ) {}
                     }
                 } else {
                     wrapFn.execedTime++;
@@ -92,11 +90,9 @@
                         //len = handlers.length;
                         handlers[i] = null;
                     }
-                    //try {
-                    setTimeout( function () {
+                    try {
                         wrapFn.h.call(wrapFn.scope, topic, msg, wrapFn.data);
-                    }, 0 );
-                    //} catch ( e2 ) {}
+                    } catch ( e2 ) {}
                 }
             }
         }
