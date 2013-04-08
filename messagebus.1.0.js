@@ -78,9 +78,11 @@
                 if (config && config._topics) {
                     if (checkWait(config._topics, config.topics, topic, msg)) {
                         clearWait(config._topics, config.topics);
-                        try {
-                            wrapFn.h.call(wrapFn.scope, topic, config.topics , wrapFn.data);
-                        } catch ( e1 ) {}
+                        //try {
+                            setTimeout( function () {
+                                wrapFn.h.call(wrapFn.scope, topic, config.topics , wrapFn.data);
+                            }, 0 );
+                        //} catch ( e1 ) {}
                     }
                 } else {
                     wrapFn.execedTime++;
@@ -90,9 +92,11 @@
                         //len = handlers.length;
                         handlers[i] = null;
                     }
-                    try {
-                        wrapFn.h.call(wrapFn.scope, topic, msg, wrapFn.data);
-                    } catch ( e2 ) {}
+                    //try {
+                        setTimeout( function () {
+                            wrapFn.h.call(wrapFn.scope, topic, msg, wrapFn.data);
+                        }, 0 );
+                    //} catch ( e2 ) {}
                 }
             }
         }
