@@ -82,8 +82,6 @@ config : {cache : boolean} 同subscribe方法相比，不支持execTime。可以
 <del>目前测试时只使用messagebus-v2.js，所以v2比v1靠谱</del>
 v1是最新版本：1、使用类方式 2、删除了setConfig方法 3、增加wait方法 <del>4、暴露query方法</del>
 
-代码暴涨到260+了，多了60多啊，mb
-
 ## License ##
 
 All directories and files are MIT Licensed.
