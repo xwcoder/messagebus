@@ -1,0 +1,40 @@
+# http://editorconfig.org
+root = true
+
+[*]
+indent_style = space
+end_of_line = lf
+insert_final_newline = true
+
+[*.js]
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[gulpfile.js]
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+
+[webpack.config.js]
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+
+[karma.conf.js]
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+
+[gulp/**.js]
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+
+[.eslintrc.json]
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
